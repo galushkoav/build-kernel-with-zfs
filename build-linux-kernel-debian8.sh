@@ -26,7 +26,9 @@ unxz patch-$KERNEL_VERSION.xz
 fi
 
 echo "Копируем config_kernel"
-cp $BUILD_DIR/config_kernel $LINUX_DIR/
+git clone https://github.com/galushkoav/build-kernel-with-zfs.git $BUILD_DIR/config
+cp $BUILD_DIR/config/config_kernel $LINUX_DIR/
+
 echo "Запускаем make prepare scripts"
 cd $LINUX_DIR
 make prepare scripts
