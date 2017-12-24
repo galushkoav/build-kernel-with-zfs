@@ -9,6 +9,8 @@ apt install parted lsscsi ksh zlib1g-dev uuid-dev libattr1-dev libblkid-dev libs
 
 echo "Создаем директорию для сборки"
 mkdir -p $BUILD_DIR
+
+cp  -f config_kernel $BUILD_DIR/.config
 cd $BUILD_DIR
 echo "Проверяем если ли скачанное ядро"
 if [ ! -d "$LINUX_DIR" ];
@@ -26,14 +28,15 @@ unxz patch-$KERNEL_VERSION.xz
 fi
 
 echo "Копируем config_kernel"
-git clone https://github.com/galushkoav/build-kernel-with-zfs.git $BUILD_DIR/config
-cp $BUILD_DIR/config/config_kernel $LINUX_DIR/
+
 
 echo "Запускаем make prepare scripts"
 cd $LINUX_DIR
+cp -f $BUILD_DIR/.config $LINUX_DIR/.config
+make prepare
 make prepare scripts
 
-Клонируем репозитории для установки поддержки zfs
+echo "Клонируем репозитории для установки поддержки zfs"
 cd $BUILD_DIR
 
 
@@ -72,11 +75,13 @@ cd $LINUX_DIR
 #patch patch-$KERNEL_VERSION -p1
 touch REPORTING-BUGS;
 echo "Очищаем"
+#make olddefconfig
 make clean 
+cp -f $BUILD_DIR/.config $LINUX_DIR/.config
 echo "Собираем deb пакет"
 make -j$CPU_COUNT deb-pkg LOCALVERSION=$KERNEL_VERSION
 echo "Сборка пакета завершена - осталось установить"
-#curl -L https://raw.githubusercontent.com/docker/docker/master/contrib/check-config.sh | CONFIG=config_kernel /bin/bash
+#curl -L https://raw.githubusercontent.com/docker/docker/master/contrib/check-config.sh | CONFIG=./config /bin/bash
 
 
 
